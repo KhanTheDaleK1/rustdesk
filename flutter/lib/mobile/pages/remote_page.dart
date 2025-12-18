@@ -26,6 +26,7 @@ import '../../models/platform_model.dart';
 import '../../utils/image.dart';
 import '../widgets/dialog.dart';
 import '../widgets/custom_scale_widget.dart';
+import '../widgets/floating_keyboard.dart';
 
 final initText = '1' * 1024;
 
@@ -67,6 +68,7 @@ class _RemotePageState extends State<RemotePage> with WidgetsBindingObserver {
   String _value = '';
   Orientation? _currentOrientation;
   double _viewInsetsBottom = 0;
+  bool _showFloatingKeyboard = false;
 
   Timer? _timerDidChangeMetrics;
 
@@ -88,6 +90,7 @@ class _RemotePageState extends State<RemotePage> with WidgetsBindingObserver {
     initSharedStates(id);
     gFFI.chatModel.voiceCallStatus.value = VoiceCallStatus.notStarted;
     gFFI.dialogManager.loadMobileActionsOverlayVisible();
+    _showFloatingKeyboard = mainGetLocalBoolOptionSync(kOptionAllowFloatingKeyboard);
   }
 
   @override
@@ -416,39 +419,46 @@ class _RemotePageState extends State<RemotePage> with WidgetsBindingObserver {
                 ],
               )),
           body: Obx(
-            () => getRawPointerAndKeyBody(Overlay(
-              initialEntries: [
-                OverlayEntry(builder: (context) {
-                  return Container(
-                    color: kColorCanvas,
-                    child: isWebDesktop
-                        ? getBodyForDesktopWithListener()
-                        : SafeArea(
-                            child:
-                                OrientationBuilder(builder: (ctx, orientation) {
-                              if (_currentOrientation != orientation) {
-                                Timer(const Duration(milliseconds: 200), () {
-                                  gFFI.dialogManager
-                                      .resetMobileActionsOverlay(ffi: gFFI);
-                                  _currentOrientation = orientation;
-                                  gFFI.canvasModel.updateViewStyle();
-                                });
-                              }
-                              return Container(
-                                color: MyTheme.canvasColor,
-                                child: inputModel.isPhysicalMouse.value
-                                    ? getBodyForMobile()
-                                    : RawTouchGestureDetectorRegion(
-                                        child: getBodyForMobile(),
-                                        ffi: gFFI,
-                                      ),
-                              );
-                            }),
-                          ),
-                  );
-                })
+            () => Stack(
+              children: [
+                getRawPointerAndKeyBody(Overlay(
+                  initialEntries: [
+                    OverlayEntry(builder: (context) {
+                      return Container(
+                        color: kColorCanvas,
+                        child: isWebDesktop
+                            ? getBodyForDesktopWithListener()
+                            : SafeArea(
+                                child: OrientationBuilder(
+                                    builder: (ctx, orientation) {
+                                  if (_currentOrientation != orientation) {
+                                    Timer(const Duration(milliseconds: 200),
+                                        () {
+                                      gFFI.dialogManager
+                                          .resetMobileActionsOverlay(ffi: gFFI);
+                                      _currentOrientation = orientation;
+                                      gFFI.canvasModel.updateViewStyle();
+                                    });
+                                  }
+                                  return Container(
+                                    color: MyTheme.canvasColor,
+                                    child: inputModel.isPhysicalMouse.value
+                                        ? getBodyForMobile()
+                                        : RawTouchGestureDetectorRegion(
+                                            child: getBodyForMobile(),
+                                            ffi: gFFI,
+                                          ),
+                                  );
+                                }),
+                              ),
+                      );
+                    })
+                  ],
+                )),
+                if (_showFloatingKeyboard)
+                  MobileFloatingKeyboard(inputModel: inputModel),
               ],
-            )),
+            ),
           )),
     );
   }
