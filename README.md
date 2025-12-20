@@ -21,7 +21,7 @@ Yet another remote desktop solution, written in Rust. Works out of the box with 
 
 ![image](https://user-images.githubusercontent.com/71636191/171661982-430285f0-2e12-4b1d-9957-4a58e375304d.png)
 
-RustDesk welcomes contribution from everyone. See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for help getting started.
+RustDesk welcomes contribution from everyone. See [CONTRIBUTING.md](CONTRIBUTING.md) for help getting started.
 
 [**FAQ**](https://github.com/rustdesk/rustdesk/wiki/FAQ)
 
@@ -35,6 +35,8 @@ RustDesk welcomes contribution from everyone. See [CONTRIBUTING.md](docs/CONTRIB
 [<img src="https://flathub.org/api/badge?svg&locale=en"
     alt="Get it on Flathub"
     height="80">](https://flathub.org/apps/com.rustdesk.RustDesk)
+
+## [License](LICENSE)
 
 ## Dependencies
 
